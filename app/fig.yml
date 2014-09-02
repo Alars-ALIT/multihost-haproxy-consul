@@ -1,0 +1,31 @@
+consul:
+  image: progrium/consul
+  ports:
+    - 8500:8500
+    - 8400:8400
+    - 8300:8300
+    - 8301:8301
+    - 8302:8302
+    - 8301:8301/udp
+    - 8302:8302/udp 
+    - 8600:53/udp
+  command: -join 10.0.5.3 -advertise 10.0.5.4 
+  hostname: consul2
+  environment:
+    SERVICE_IGNORE: true
+    PRIVATE_IP:
+
+app:
+  image: google/nodejs-hello
+  ports:
+    - 8080
+  environment:
+    SERVICE_NAME: app
+    SERVICE_TAGS: master,backups
+    SERVICE_REGION: dc1
+
+registrator:
+  image: progrium/registrator
+  volumes:
+    - /var/run/docker.sock:/tmp/docker.sock
+  command: consul://10.0.5.4:8500
